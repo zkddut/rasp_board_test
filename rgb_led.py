@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import time
 import RPi.GPIO as GPIO
+from time import sleep
 
 # RGB LED Module (TEST)
 
@@ -16,6 +17,7 @@ RGB_RED = 17
 RGB_GREEN = 27
 RGB_BLUE = 22
 RGB = [RGB_RED,RGB_GREEN,RGB_BLUE]
+RGB_LED = []
 
 def rgb_setup():
   #Set up the wiring
@@ -25,6 +27,7 @@ def rgb_setup():
   # Setup Ports
   for val in RGB:
     GPIO.setup(val, GPIO.OUT)
+    RGB_LED.append(GPIO.PWM(val, 50))
 
 def rgb_activate(colour):
   GPIO.output(colour, RGB_ENABLE)
@@ -35,10 +38,13 @@ def rgb_deactivate(colour):
 def rgb_clear():
   for val in RGB:
     GPIO.output(val, RGB_DISABLE)
+  for led in RGB_LED:
+    led.stop()
 
 def rgb_colour(colours):
   for colour, value in enumerate(colours):
-    GPIO.output(RGB[colour], value)
+    RGB_LED[colour].start(0)
+    RGB_LED[colour].ChangeDutyCycle(value)
 
 def main():
   rgb_setup()
